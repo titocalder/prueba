@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1400">
+<title>Tuu · Dashboard Desk 2 & Pinpad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0D2B;--bg2:#12122E;--card:#161638;--card2:#1c1c42;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --cyan:#00D4FF;--green:#00E5A0;--yellow:#FFD166;--red:#FF5A5F;
+  --blue:#4D4DFF;--purple:#C77DFF;--orange:#FF8C42;--pink:#FF5A8C;
+  --gray:#8888AA;--gray2:#55556A;--white:#FFFFFF;
+}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;}
+
+/* ── HEADER ── */
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 32px;background:var(--bg2);
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+}
+.top-brand{display:flex;align-items:center;gap:14px;}
+.top-logo{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;color:#fff;
+}
+.top-title{font-size:15px;font-weight:700;}
+.top-sub{font-size:11px;color:var(--gray);}
+.top-period{
+  background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);
+  border-radius:8px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--cyan);
+}
+
+/* ── FILTERS BAR ── */
+.filters-bar{
+  padding:14px 32px;background:var(--bg2);
+  border-bottom:2px solid rgba(0,212,255,0.15);
+  display:flex;gap:28px;align-items:center;flex-wrap:wrap;
+  position:sticky;top:67px;z-index:99;
+}
+.filter-group{display:flex;align-items:center;gap:8px;}
+.filter-label{
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  color:var(--gray);text-transform:uppercase;white-space:nowrap;
+}
+.filter-btn{
+  padding:6px 14px;border-radius:20px;border:1px solid var(--border2);
+  background:transparent;color:var(--gray);font-family:'Poppins',sans-serif;
+  font-size:11px;font-weight:600;cursor:pointer;transition:all .18s;
+  white-space:nowrap;
+}
+.filter-btn:hover{border-color:var(--cyan);color:var(--white);}
+.filter-btn.active{
+  background:rgba(0,212,255,0.15);border-color:var(--cyan);
+  color:var(--cyan);
+}
+.filter-btn.active.m-green{background:rgba(0,229,160,0.15);border-color:var(--green);color:var(--green);}
+.filter-btn.active.m-yellow{background:rgba(255,209,102,0.15);border-color:var(--yellow);color:var(--yellow);}
+.filter-sep{width:1px;height:28px;background:var(--border);}
+.estimated-chip{
+  margin-left:auto;display:none;align-items:center;gap:6px;
+  background:rgba(255,209,102,0.1);border:1px solid rgba(255,209,102,0.3);
+  border-radius:8px;padding:5px 12px;font-size:10px;font-weight:600;
+  color:var(--yellow);
+}
+.estimated-chip.show{display:flex;}
+
+/* ── MAIN ── */
+.main{padding:24px 32px;display:flex;flex-direction:column;gap:20px;}
+
+/* ── KPI ROW ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.kpi-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:20px 22px;position:relative;overflow:hidden;
+}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi-card.kc-cyan::before{background:var(--cyan);}
+.kpi-card.kc-green::before{background:var(--green);}
+.kpi-card.kc-yellow::before{background:var(--yellow);}
+.kpi-card.kc-red::before{background:var(--red);}
+.kpi-lbl{font-size:10px;font-weight:600;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;margin-bottom:8px;}
+.kpi-val{font-size:32px;font-weight:800;line-height:1;}
+.kpi-sub{font-size:11px;color:var(--gray);margin-top:5px;}
+
+/* ── GRID LAYOUTS ── */
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
+.row-2-3{display:grid;grid-template-columns:2fr 3fr;gap:20px;}
+.row-3-2{display:grid;grid-template-columns:3fr 2fr;gap:20px;}
+
+/* ── PANEL ── */
+.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:20px 22px;
+}
+.panel-title{
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  color:var(--gray);text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.panel-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--border2),transparent);}
+
+/* ── BAR CHART ── */
+.bar-group{display:flex;flex-direction:column;gap:10px;}
+.bar-item{display:flex;align-items:center;gap:10px;}
+.bar-lbl{font-size:11px;color:var(--white);white-space:nowrap;}
+.bar-lbl.w120{min-width:120px;max-width:120px;overflow:hidden;text-overflow:ellipsis;}
+.bar-lbl.w160{min-width:160px;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+.bar-lbl.w80{min-width:80px;}
+.bar-track{flex:1;background:rgba(255,255,255,0.06);border-radius:4px;height:20px;overflow:hidden;}
+.bar-fill{
+  height:100%;border-radius:4px;display:flex;align-items:center;
+  padding-left:8px;font-size:10px;font-weight:700;color:rgba(0,0,0,0.75);
+  transition:width .4s cubic-bezier(.4,0,.2,1);white-space:nowrap;
+  min-width:2px;
+}
+.bar-num{font-size:11px;font-weight:700;min-width:52px;text-align:right;}
+
+/* ── TABLE ── */
+.dash-table{width:100%;border-collapse:collapse;}
+.dash-table th{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--gray);padding:7px 10px;text-align:left;
+  border-bottom:1px solid var(--border);
+}
+.dash-table td{font-size:12px;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.dash-table tr:last-child td{border-bottom:none;}
+.dash-table tr:hover td{background:rgba(255,255,255,0.02);}
+.dash-table td.right{text-align:right;}
+.dash-table td.center{text-align:center;}
+
+/* ── BADGE ── */
+.badge{
+  display:inline-block;padding:2px 9px;border-radius:20px;
+  font-size:10px;font-weight:700;white-space:nowrap;
+}
+.bg-green{background:var(--green);color:#0D2B1E;}
+.bg-yellow{background:var(--yellow);color:#2B2000;}
+.bg-red{background:var(--red);color:#fff;}
+.bg-blue{background:var(--blue);color:#fff;}
+.bg-cyan{background:var(--cyan);color:#0D1F2B;}
+.bg-gray{background:rgba(136,136,170,0.25);color:var(--gray);}
+
+/* ── METRIC MINI ── */
+.metric-row{display:flex;flex-direction:column;gap:12px;}
+.metric-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;background:rgba(255,255,255,0.03);
+  border-radius:10px;border:1px solid var(--border);
+}
+.mi-label{font-size:11px;color:var(--gray);}
+.mi-val{font-size:16px;font-weight:800;}
+
+/* ── DONUT LEGEND ── */
+.rubro-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.rubro-row:last-child{border-bottom:none;}
+.rub-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.rub-bar-track{flex:1;background:rgba(255,255,255,0.06);border-radius:3px;height:14px;overflow:hidden;}
+.rub-bar-fill{height:100%;border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1);}
+.rub-name{font-size:10px;color:var(--gray);min-width:160px;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+.rub-pct{font-size:11px;font-weight:700;min-width:42px;text-align:right;}
+.rub-cnt{font-size:10px;color:var(--gray2);min-width:28px;text-align:right;}
+
+/* ── VENDOR ROW ── */
+.v-row{
+  display:flex;align-items:center;gap:12px;
+  padding:8px 12px;border-radius:10px;margin-bottom:5px;
+}
+.v-row.ok{background:rgba(0,229,160,0.06);}
+.v-row.warn{background:rgba(255,209,102,0.07);}
+.v-row.bad{background:rgba(255,90,95,0.08);}
+.v-name{font-size:12px;font-weight:600;flex:1;}
+.v-num{font-size:11px;color:var(--gray);min-width:60px;text-align:right;}
+
+/* ── ALERT ── */
+.alert-box{
+  background:rgba(255,90,95,0.07);border:1px solid rgba(255,90,95,0.25);
+  border-radius:12px;padding:14px 16px;font-size:12px;line-height:1.6;
+  margin-top:12px;
+}
+.info-box{
+  background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);
+  border-radius:12px;padding:12px 16px;font-size:11px;color:rgba(255,255,255,0.8);
+  line-height:1.6;
+}
+
+/* ── COLOR UTILS ── */
+.c-cyan{color:var(--cyan)!important;}
+.c-green{color:var(--green)!important;}
+.c-yellow{color:var(--yellow)!important;}
+.c-red{color:var(--red)!important;}
+.c-gray{color:var(--gray)!important;}
+.c-white{color:var(--white)!important;}
+</style>
+</head>
+<body>
+
+<!-- ══ TOP BAR ════════════════════════════════════════════════ -->
+<header class="top-bar">
+  <div class="top-brand">
+    <div class="top-logo">T</div>
+    <div>
+      <div class="top-title">Tuu · Desk 2 &amp; Pinpad · Dashboard</div>
+      <div class="top-sub">Análisis de ventas, activación y catálogo</div>
+    </div>
+  </div>
+  <div class="top-period">Feb 17 — Abr 29, 2026</div>
+</header>
+
+<!-- ══ FILTERS ════════════════════════════════════════════════ -->
+<div class="filters-bar" id="filtersBar">
+  <div class="filter-group">
+    <span class="filter-label">Máquina</span>
+    <button class="filter-btn active" data-group="machine" data-val="all">Todos</button>
+    <button class="filter-btn m-cyan" data-group="machine" data-val="desk2">Desk 2</button>
+    <button class="filter-btn m-green" data-group="machine" data-val="pinpad">Pinpad</button>
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group">
+    <span class="filter-label">Canal</span>
+    <button class="filter-btn active" data-group="canal" data-val="all">Todos</button>
+    <button class="filter-btn" data-group="canal" data-val="directa">Venta directa</button>
+    <button class="filter-btn" data-group="canal" data-val="partner">Partner</button>
+    <button class="filter-btn" data-group="canal" data-val="asistida">Venta asistida</button>
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group" style="flex-wrap:wrap;gap:6px;max-width:620px;">
+    <span class="filter-label">Macro rubro</span>
+    <button class="filter-btn active" data-group="rubro" data-val="all">Todos</button>
+    <button class="filter-btn" data-group="rubro" data-val="almacenes">Almacenes</button>
+    <button class="filter-btn" data-group="rubro" data-val="gastronomia">Gastronomía</button>
+    <button class="filter-btn" data-group="rubro" data-val="especializadas">T. Especializadas</button>
+    <button class="filter-btn" data-group="rubro" data-val="varias">T. Varias</button>
+    <button class="filter-btn" data-group="rubro" data-val="agro">Agro</button>
+    <button class="filter-btn" data-group="rubro" data-val="manufactura">Manufactura</button>
+    <button class="filter-btn" data-group="rubro" data-val="mascotas">Mascotas y Salud</button>
+    <button class="filter-btn" data-group="rubro" data-val="online">Ventas Online</button>
+    <button class="filter-btn" data-group="rubro" data-val="servicios">Servicios</button>
+    <button class="filter-btn" data-group="rubro" data-val="otros">Otros</button>
+  </div>
+  <div class="estimated-chip" id="estimatedChip">
+    ⚡ Algunos valores son estimados por combinación de filtros
+  </div>
+</div>
+
+<!-- ══ MAIN ═══════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- KPI ROW -->
+  <div class="kpi-row">
+    <div class="kpi-card kc-cyan">
+      <div class="kpi-lbl">Terminales vendidos</div>
+      <div class="kpi-val c-cyan" id="kpi-units">300</div>
+      <div class="kpi-sub" id="kpi-units-sub">128 invoices únicas</div>
+    </div>
+    <div class="kpi-card kc-green">
+      <div class="kpi-lbl">Revenue total</div>
+      <div class="kpi-val c-green" id="kpi-revenue">$27.3M</div>
+      <div class="kpi-sub" id="kpi-revenue-sub">CLP · Desk 2 = 71%</div>
+    </div>
+    <div class="kpi-card kc-yellow">
+      <div class="kpi-lbl">Tasa activación (c/RUT)</div>
+      <div class="kpi-val c-yellow" id="kpi-activation">85.4%</div>
+      <div class="kpi-sub" id="kpi-activation-sub">193 de 226 con RUT</div>
+    </div>
+    <div class="kpi-card kc-red">
+      <div class="kpi-lbl">Sin activar (c/RUT)</div>
+      <div class="kpi-val c-red" id="kpi-inactive">33</div>
+      <div class="kpi-sub" id="kpi-inactive-sub">prom. 37 días sin uso</div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Activación + Canal -->
+  <div class="row-2">
+    <div class="panel">
+      <div class="panel-title">Activación por producto</div>
+      <div class="bar-group" id="chart-activation">
+        <!-- rendered by JS -->
+      </div>
+      <div style="margin-top:16px;" id="act-extra"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Performance por canal</div>
+      <table class="dash-table" id="table-canal">
+        <!-- rendered by JS -->
+      </table>
+    </div>
+  </div>
+
+  <!-- ROW 3: Macro Rubro + Comunas -->
+  <div class="row-3-2">
+    <div class="panel">
+      <div class="panel-title">Distribución por macro rubro <span id="rubro-universe" style="font-size:10px;color:var(--gray);font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px;"></span></div>
+      <div id="chart-rubros">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Top comunas</div>
+      <table class="dash-table" id="table-comunas">
+        <!-- rendered by JS -->
+      </table>
+    </div>
+  </div>
+
+  <!-- ROW 4: Catálogo + Impacto -->
+  <div class="row-2">
+    <div class="panel">
+      <div class="panel-title">Catálogo &amp; Inventario digital</div>
+      <div id="chart-catalog"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Impacto en el negocio · antes vs. después</div>
+      <div id="chart-impacto"></div>
+    </div>
+  </div>
+
+  <!-- ROW 5: Vendedores -->
+  <div class="panel">
+    <div class="panel-title">Equipo Comercial · Performance por vendedor</div>
+    <div class="row-2">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--green);margin-bottom:10px;">TOP PERFORMERS</div>
+        <div class="v-row ok"><div class="v-name c-green">⭐ Kamila Morales</div><div class="v-num c-gray">12 ventas</div><div class="v-num c-gray">$1.129.400</div><span class="badge bg-green">100%</span></div>
+        <div class="v-row ok"><div class="v-name c-green">⭐ Rosario Muñoz</div><div class="v-num c-gray">6 ventas</div><div class="v-num c-gray">$524.700</div><span class="badge bg-green">100%</span></div>
+        <div class="v-row ok"><div class="v-name">Nicolas Ceresuela</div><div class="v-num c-gray">4 ventas</div><div class="v-num c-gray">$429.800</div><span class="badge bg-green">100%</span></div>
+        <div class="v-row ok"><div class="v-name">Saynell Mora</div><div class="v-num c-gray">4 ventas</div><div class="v-num c-gray">$389.800</div><span class="badge bg-green">100%</span></div>
+        <div class="v-row warn" style="margin-top:12px;"><div class="v-name c-yellow">⚠ Tamara Veliz</div><div class="v-num c-gray">3 ventas</div><div class="v-num c-gray">$241.800</div><span class="badge bg-yellow">33.3%</span></div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--red);margin-bottom:10px;">🚨 ACCIÓN URGENTE · 0% ACTIVACIÓN</div>
+        <div class="v-row bad"><div class="v-name c-red">Rodrigo Gonzalez</div><div class="v-num c-gray">4 ventas</div><div class="v-num c-gray">$358.800</div><span class="badge bg-red">0%</span></div>
+        <div class="v-row bad"><div class="v-name c-red">Gustavo Riquelme</div><div class="v-num c-gray">2 ventas</div><div class="v-num c-gray">$174.900</div><span class="badge bg-red">0%</span></div>
+        <div class="v-row bad"><div class="v-name c-red">Joan Vega</div><div class="v-num c-gray">2 ventas</div><div class="v-num c-gray">$174.900</div><span class="badge bg-red">0%</span></div>
+        <div class="alert-box">
+          Ningún cliente de estos 3 vendedores ha procesado una sola transacción. Revisar perfil de cliente y onboarding post-venta.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const SEG = {
+  units:     { all:{all:300,directa:170,partner:93,asistida:35},    desk2:{all:154,directa:87,partner:48,asistida:18},    pinpad:{all:146,directa:83,partner:45,asistida:17} },
+  revenue:   { all:{all:27.3,directa:16.7,partner:8.2,asistida:2.4}, desk2:{all:19.4,directa:10.8,partner:6.1,asistida:1.6}, pinpad:{all:7.9,directa:5.9,partner:2.1,asistida:0.8} },
+  withRut:   { all:{all:226,directa:148,partner:49,asistida:27},     desk2:{all:113,directa:76,partner:25,asistida:12},     pinpad:{all:113,directa:72,partner:24,asistida:13} },
+  activated: { all:{all:193,directa:119,partner:47,asistida:25},     desk2:{all:97, directa:61,partner:24,asistida:11},     pinpad:{all:96, directa:58,partner:23,asistida:12} },
+  dispatch:  { all:{all:6.5,directa:5.0,partner:10.4,asistida:6.1},  desk2:{all:5.8,directa:5.0,partner:10.2,asistida:6.0}, pinpad:{all:6.2,directa:5.0,partner:10.6,asistida:6.2} },
+  trx:       { all:{all:1200,directa:1514,partner:494,asistida:1941}, desk2:{all:1350,directa:1514,partner:500,asistida:1941},pinpad:{all:1050,directa:1514,partner:488,asistida:1941} },
+  catalog:   { all:{all:71.7,directa:73.6,partner:65.3,asistida:70.4},desk2:{all:72.0,directa:73.8,partner:65.5,asistida:70.6},pinpad:{all:71.4,directa:73.4,partner:65.1,asistida:70.2} },
+};
+
+const RUBROS = [
+  {id:'almacenes',    name:'Minorista – Almacenes y Abarrotes',  short:'Almacenes',       count:43, pct:42.6, color:'#00E5A0', activation:88},
+  {id:'gastronomia',  name:'Gastronomía / Alimentos y bebidas',  short:'Gastronomía',      count:10, pct:9.9,  color:'#00D4FF', activation:80},
+  {id:'especializadas',name:'Minorista – Tiendas Especializadas',short:'T. Especializadas',count:10, pct:9.9,  color:'#4D4DFF', activation:85},
+  {id:'varias',       name:'Minorista – Tiendas Varias',         short:'T. Varias',        count:6,  pct:5.9,  color:'#FFD166', activation:83},
+  {id:'agro',         name:'Agro / Silvo / Pesca',               short:'Agro',             count:4,  pct:4.0,  color:'#FF8C42', activation:90},
+  {id:'manufactura',  name:'Manufactura',                        short:'Manufactura',      count:4,  pct:4.0,  color:'#C77DFF', activation:87},
+  {id:'mascotas',     name:'Minorista – Mascotas y Salud',       short:'Mascotas y Salud', count:4,  pct:4.0,  color:'#FF5A8C', activation:80},
+  {id:'online',       name:'Minorista – Ventas Online',          short:'Ventas Online',    count:4,  pct:4.0,  color:'#06D6A0', activation:82},
+  {id:'servicios',    name:'Servicios varios',                   short:'Servicios',        count:4,  pct:4.0,  color:'#EF476F', activation:78},
+  {id:'otros',        name:'Otros rubros',                       short:'Otros',            count:12, pct:11.9, color:'#888899', activation:83},
+];
+// Total classified = 101 out of 226 with RUT (44.7%)
+const TOTAL_CLASSIFIED = 101;
+
+const COMUNAS = [
+  {name:'Santiago',       total:43, pct:19.0, desk2:21, pinpad:22, activation:74.4},
+  {name:'Punta Arenas ★', total:24, pct:10.6, desk2:12, pinpad:12, activation:100},
+  {name:'La Ligua',       total:14, pct:6.2,  desk2:7,  pinpad:7,  activation:100},
+  {name:'Rancagua',       total:10, pct:4.4,  desk2:5,  pinpad:5,  activation:80},
+  {name:'Concepción',     total:8,  pct:3.5,  desk2:4,  pinpad:4,  activation:100},
+  {name:'Curicó',         total:6,  pct:2.7,  desk2:3,  pinpad:3,  activation:67},
+  {name:'Pichilemu',      total:6,  pct:2.7,  desk2:3,  pinpad:3,  activation:67},
+  {name:'Cobquecura ⚠',  total:4,  pct:1.8,  desk2:2,  pinpad:2,  activation:0},
+  {name:'Talca',          total:4,  pct:1.8,  desk2:2,  pinpad:2,  activation:100},
+  {name:'Canela',         total:4,  pct:1.8,  desk2:2,  pinpad:2,  activation:100},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const state = { machine: 'all', canal: 'all', rubro: 'all' };
+
+// ═══════════════════════════════════════════════════════════════
+// COMPUTE METRICS
+// ═══════════════════════════════════════════════════════════════
+function compute() {
+  const m = state.machine, c = state.canal, r = state.rubro;
+  let estimated = false;
+
+  let units     = SEG.units[m][c];
+  let revenue   = SEG.revenue[m][c];
+  let withRut   = SEG.withRut[m][c];
+  let activated = SEG.activated[m][c];
+  let dispatch  = SEG.dispatch[m][c];
+  let trx       = SEG.trx[m][c];
+  let catalog   = SEG.catalog[m][c];
+
+  if (r !== 'all') {
+    const rData = RUBROS.find(x => x.id === r);
+    // Rubro has `count` out of 226 total with RUT
+    // For machine filter: assume ~50/50 split (113 each)
+    // Scale by rubro ratio within withRut
+    const baseWithRut = SEG.withRut.all.all; // 226
+    const machineRatio = withRut / baseWithRut; // e.g. desk2 = 113/226 = 0.5
+    // Rubro count out of 101 classified → scale to full withRut universe
+    // Assume same classification rate per machine/canal
+    const scaledCount = Math.round(rData.count * machineRatio * (SEG.withRut[m][c] / SEG.withRut[m].all));
+    withRut   = Math.max(1, scaledCount);
+    activated = Math.round(withRut * rData.activation / 100);
+    units     = Math.round(units * (rData.count / baseWithRut));
+    revenue   = Math.round(revenue * (rData.count / baseWithRut) * 10) / 10;
+    estimated = true;
+  }
+
+  const activation = withRut > 0 ? +(activated / withRut * 100).toFixed(1) : 0;
+  const inactive   = withRut - activated;
+
+  return { units, revenue, withRut, activated, activated, activation, inactive, dispatch, trx, catalog, estimated };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER HELPERS
+// ═══════════════════════════════════════════════════════════════
+function pct(val, tot) { return tot > 0 ? (val/tot*100).toFixed(1) : '0.0'; }
+function fmtRev(v) {
+  if (v >= 1) return '$' + v.toFixed(1) + 'M';
+  return '$' + (v * 1000).toFixed(0) + 'K';
+}
+function actBadge(a) {
+  if (a >= 90) return `<span class="badge bg-green">${a}%</span>`;
+  if (a >= 70) return `<span class="badge bg-yellow">${a}%</span>`;
+  return `<span class="badge bg-red">${a}%</span>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function render() {
+  const m = state.machine, c = state.canal, r = state.rubro;
+  const M = compute();
+
+  // ── Estimated chip ──
+  document.getElementById('estimatedChip').classList.toggle('show', M.estimated);
+
+  // ── KPIs ──
+  document.getElementById('kpi-units').textContent    = M.units;
+  document.getElementById('kpi-units-sub').textContent = `${M.withRut} con RUT identificado`;
+  document.getElementById('kpi-revenue').textContent  = fmtRev(M.revenue);
+  document.getElementById('kpi-revenue-sub').textContent = m === 'all'
+    ? 'CLP · Desk 2 = 71%'
+    : (m === 'desk2' ? 'CLP · Desk 2' : 'CLP · Pinpad');
+  document.getElementById('kpi-activation').textContent = M.activation + '%';
+  const actColor = M.activation >= 90 ? 'var(--green)' : M.activation >= 75 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('kpi-activation').style.color = actColor;
+  document.getElementById('kpi-activation-sub').textContent = `${M.activated} de ${M.withRut} con RUT`;
+  document.getElementById('kpi-inactive').textContent = M.inactive;
+  document.getElementById('kpi-inactive-sub').textContent = M.inactive === 0 ? '¡Todos activados!' : 'terminales sin activar';
+
+  // ── Activación por producto ──
+  const actDiv = document.getElementById('chart-activation');
+  const actExtra = document.getElementById('act-extra');
+  if (m === 'all' && r === 'all') {
+    // Show both products
+    const d2Act = +(SEG.activated.desk2[c] / SEG.withRut.desk2[c] * 100).toFixed(1);
+    const ppAct = +(SEG.activated.pinpad[c] / SEG.withRut.pinpad[c] * 100).toFixed(1);
+    actDiv.innerHTML = `
+      <div class="bar-item" style="margin-bottom:6px;">
+        <div class="bar-lbl w120">Desk 2</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${d2Act}%;background:var(--cyan);">${d2Act}%</div></div>
+        <div class="bar-num c-cyan">${SEG.activated.desk2[c]}/${SEG.withRut.desk2[c]}</div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-lbl w120">Pinpad</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${ppAct}%;background:var(--green);">${ppAct}%</div></div>
+        <div class="bar-num c-green">${SEG.activated.pinpad[c]}/${SEG.withRut.pinpad[c]}</div>
+      </div>`;
+    // Cliente tipo
+    actExtra.innerHTML = `
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gray);margin-bottom:10px;">POR PERFIL DE CLIENTE</div>
+      <div class="bar-item" style="margin-bottom:6px;">
+        <div class="bar-lbl w120">Cliente previo</div>
+        <div class="bar-track"><div class="bar-fill" style="width:92%;background:var(--green);">92%</div></div>
+        <div class="bar-num c-green">151 term.</div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-lbl w120">Cliente nuevo</div>
+        <div class="bar-track"><div class="bar-fill" style="width:72%;background:var(--yellow);">72%</div></div>
+        <div class="bar-num c-yellow">75 term.</div>
+      </div>`;
+  } else {
+    actDiv.innerHTML = `
+      <div class="bar-item">
+        <div class="bar-lbl w120">${m==='desk2'?'Desk 2':m==='pinpad'?'Pinpad':'Todos'}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${M.activation}%;background:var(--cyan);">${M.activation}%</div></div>
+        <div class="bar-num c-cyan">${M.activated}/${M.withRut}</div>
+      </div>`;
+    actExtra.innerHTML = `
+      <div class="info-box" style="margin-top:8px;">
+        <strong>${M.activated}</strong> terminales activados de <strong>${M.withRut}</strong> con RUT en este segmento.
+        Tasa: <strong style="color:${actColor}">${M.activation}%</strong>
+      </div>`;
+  }
+
+  // ── Canal table ──
+  const canales = ['directa','partner','asistida'];
+  const canalNames = {directa:'Venta directa', partner:'Partner', asistida:'Venta asistida'};
+  let canalRows = '';
+  canales.forEach(ch => {
+    if (c !== 'all' && ch !== c) return;
+    const wR  = SEG.withRut[m][ch];
+    const act = SEG.activated[m][ch];
+    const actPct = wR > 0 ? +(act/wR*100).toFixed(1) : 0;
+    const disp = SEG.dispatch[m][ch];
+    const t = SEG.trx[m][ch];
+    let dispColor = disp >= 10 ? 'c-yellow' : '';
+    let trxColor  = t < 600 ? 'c-red' : t > 1800 ? 'c-green' : '';
+    let nameColor = ch === 'partner' ? 'c-cyan' : '';
+    canalRows += `<tr>
+      <td class="${nameColor}" style="font-weight:600;">${canalNames[ch]}</td>
+      <td class="center">${SEG.units[m][ch]}</td>
+      <td class="center">${wR}</td>
+      <td>${actBadge(actPct)}</td>
+      <td class="center ${dispColor}">${disp}d</td>
+      <td class="center ${trxColor}">${t.toLocaleString('es-CL')}</td>
+    </tr>`;
+  });
+  document.getElementById('table-canal').innerHTML = `
+    <thead><tr>
+      <th>Canal</th><th>Units.</th><th>c/RUT</th><th>% Activ.</th><th>Desp.</th><th>Trx post</th>
+    </tr></thead>
+    <tbody>${canalRows}</tbody>`;
+
+  // ── Macro rubros ──
+  let rubros = r === 'all' ? RUBROS : RUBROS.filter(x => x.id === r);
+  const maxCount = Math.max(...rubros.map(x => x.count));
+  let rubroRows = '';
+  rubros.forEach(rb => {
+    // Scale count if machine or canal filter active
+    let cnt = rb.count;
+    const scaleFactor = M.withRut / SEG.withRut.all.all;
+    cnt = Math.max(1, Math.round(rb.count * scaleFactor));
+    const pctVal = r === 'all' ? rb.pct : 100;
+    const barW   = r === 'all' ? (rb.count / maxCount * 100).toFixed(1) : 100;
+    rubroRows += `<div class="rubro-row">
+      <div class="rub-dot" style="background:${rb.color};"></div>
+      <div class="rub-name" title="${rb.name}">${rb.name}</div>
+      <div class="rub-bar-track"><div class="rub-bar-fill" style="width:${barW}%;background:${rb.color};"></div></div>
+      <div class="rub-pct" style="color:${rb.color};">${r==='all'?rb.pct+'%':''}</div>
+      <div class="rub-cnt">${cnt}</div>
+    </div>`;
+  });
+  const unclassified = Math.round(125 * (M.withRut / 226));
+  document.getElementById('rubro-universe').textContent =
+    `(${r === 'all' ? TOTAL_CLASSIFIED : rubros.reduce((a,b)=>a+b.count,0)} clasificados · ${unclassified} sin clasificar)`;
+  document.getElementById('chart-rubros').innerHTML = rubroRows;
+
+  // ── Comunas ──
+  let comRows = '';
+  COMUNAS.forEach(co => {
+    const units = m === 'desk2' ? co.desk2 : m === 'pinpad' ? co.pinpad : co.total;
+    let scale = m === 'all' ? 1 : 0.5;
+    if (c !== 'all') { // scale proportionally by canal
+      const cRatio = SEG.units[m][c] / SEG.units[m].all;
+      scale *= cRatio;
+    }
+    if (r !== 'all') {
+      const rb = RUBROS.find(x => x.id === r);
+      scale *= rb.count / TOTAL_CLASSIFIED;
+    }
+    const scaled = Math.max(0, Math.round(units * (c==='all'&&m==='all'&&r==='all'?1:scale)));
+    const pctDisp = (scaled / (m==='all'?226:113) * 100).toFixed(1);
+    const starClass = co.name.includes('★') ? 'c-cyan' : co.name.includes('⚠') ? 'c-red' : '';
+    const actBadgeHtml = actBadge(co.activation);
+    comRows += `<tr>
+      <td class="${starClass}" style="font-weight:${starClass?'700':'500'}">${co.name}</td>
+      <td class="center">${c==='all'&&m==='all'&&r==='all'?co.total:scaled}</td>
+      <td>${actBadgeHtml}</td>
+    </tr>`;
+  });
+  document.getElementById('table-comunas').innerHTML = `
+    <thead><tr>
+      <th>Comuna</th><th>Term.</th><th>% Activ.</th>
+    </tr></thead>
+    <tbody>${comRows}</tbody>`;
+
+  // ── Catálogo ──
+  const catPct = M.catalog;
+  document.getElementById('chart-catalog').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;margin-bottom:6px;">Catálogo activo</div>
+        <div style="font-size:36px;font-weight:900;color:var(--green);">70.8%</div>
+        <div style="font-size:11px;color:var(--gray);">160 de 226</div>
+      </div>
+      <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;margin-bottom:6px;">Al menos 1 prod.</div>
+        <div style="font-size:36px;font-weight:900;color:var(--cyan);">${catPct}%</div>
+        <div style="font-size:11px;color:var(--gray);">cat. o inventario</div>
+      </div>
+    </div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--gray);margin-bottom:10px;">VS. BASE HAULMER GENERAL</div>
+    <div class="bar-item" style="margin-bottom:8px;">
+      <div class="bar-lbl w120">Base Haulmer</div>
+      <div class="bar-track"><div class="bar-fill" style="width:11%;background:var(--yellow);">11%</div></div>
+      <div class="bar-num c-yellow">11%</div>
+    </div>
+    <div class="bar-item">
+      <div class="bar-lbl w120">Clientes Tuu</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${catPct}%;background:var(--green);">${catPct}%</div></div>
+      <div class="bar-num c-green">${catPct}%</div>
+    </div>
+    <div class="info-box" style="margin-top:14px;">
+      Clientes Tuu tienen <strong style="color:var(--green);">6.5×</strong> más adopción de catálogo que la base general.<br>
+      Los comercios activados tienen catálogo en <strong style="color:var(--green);">77.7%</strong> vs 36.4% de los no activados.
+    </div>`;
+
+  // ── Impacto ──
+  document.getElementById('chart-impacto').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:var(--gray);text-transform:uppercase;margin-bottom:4px;">Var. trx/día</div>
+        <div style="font-size:30px;font-weight:900;color:var(--green);">+6.3%</div>
+      </div>
+      <div style="background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:var(--gray);text-transform:uppercase;margin-bottom:4px;">Var. monto/día</div>
+        <div style="font-size:30px;font-weight:900;color:var(--green);">+18.6%</div>
+      </div>
+      <div style="background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.2);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:var(--gray);text-transform:uppercase;margin-bottom:4px;">Var. ticket</div>
+        <div style="font-size:30px;font-weight:900;color:var(--yellow);">−8%</div>
+      </div>
+    </div>
+    <div class="metric-row">
+      <div class="metric-item">
+        <div class="mi-label">Días hasta 1ª transacción (mediana)</div>
+        <div class="mi-val c-green">7.5 días</div>
+      </div>
+      <div class="metric-item">
+        <div class="mi-label">Tasa de error post-compra (c/RUT)</div>
+        <div class="mi-val c-cyan">4.93%</div>
+      </div>
+      <div class="metric-item">
+        <div class="mi-label">Trx promedio post-compra · ${c==='all'?'todos los canales':c}</div>
+        <div class="mi-val c-white">${M.trx.toLocaleString('es-CL')}</div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FILTER BUTTONS
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const group = btn.dataset.group;
+    const val   = btn.dataset.val;
+
+    // Update state
+    state[group] = val;
+
+    // Update active button in group
+    document.querySelectorAll(`.filter-btn[data-group="${group}"]`).forEach(b => {
+      b.classList.remove('active','m-green','m-yellow');
+    });
+    btn.classList.add('active');
+    if (group === 'machine') {
+      if (val === 'desk2') btn.classList.add('m-cyan');
+      if (val === 'pinpad') btn.classList.add('m-green');
+    }
+
+    render();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+render();
+</script>
+</body>
+</html>
