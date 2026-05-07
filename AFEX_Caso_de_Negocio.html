@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caso de Negocio · AFEX × Haulmer</title>
+<style>
+  :root {
+    --dark-blue: #1F4E79;
+    --med-blue:  #2E75B6;
+    --light-blue:#BDD7EE;
+    --very-light:#DEEAF1;
+    --green-dark:#1F6B2E;
+    --green-med: #375623;
+    --green-light:#E2EFDA;
+    --orange:    #ED7D31;
+    --yellow-bg: #FFF2CC;
+    --gray-light:#F2F2F2;
+    --gray:      #6c757d;
+    --border:    #d0d0d0;
+    --white:     #ffffff;
+    --black:     #000000;
+    --blue-input:#0040cc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    background: #f0f4f8;
+    color: var(--black);
+    min-height: 100vh;
+  }
+  /* ── Header ── */
+  .page-header {
+    background: var(--dark-blue);
+    color: white;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .page-header h1 { font-size: 18px; font-weight: 700; letter-spacing: .5px; }
+  .page-header p  { font-size: 11px; opacity: .75; margin-top: 2px; }
+
+  /* ── Layout ── */
+  .main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px 32px; max-width: 1400px; margin: 0 auto; }
+  .col-left  { display: flex; flex-direction: column; gap: 16px; }
+  .col-right { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── Cards ── */
+  .card {
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+    overflow: hidden;
+  }
+  .card-header {
+    background: var(--dark-blue);
+    color: white;
+    padding: 8px 14px;
+    font-weight: 700;
+    font-size: 11.5px;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+  .card-header.green  { background: var(--green-dark); }
+  .card-header.blue2  { background: var(--med-blue); }
+  .card-body { padding: 12px 14px; }
+
+  /* ── Param table ── */
+  .param-table { width: 100%; border-collapse: collapse; }
+  .param-table tr:not(:last-child) td { border-bottom: 1px solid var(--border); }
+  .param-table td { padding: 6px 4px; vertical-align: middle; }
+  .param-table .lbl { color: #333; width: 55%; padding-right: 8px; }
+  .param-table .inp { width: 22%; }
+  .param-table .note { font-size: 10px; color: var(--gray); width: 23%; }
+  .param-table input[type=number], .param-table input[type=text] {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--yellow-bg);
+    color: var(--blue-input);
+    font-weight: 600;
+    font-size: 12px;
+    text-align: right;
+  }
+  .param-table input:focus { outline: 2px solid var(--med-blue); border-color: var(--med-blue); }
+
+  /* ── Check grid ── */
+  .check-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px 12px;
+    padding: 10px 14px;
+  }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .1s;
+    user-select: none;
+  }
+  .check-item:hover { background: var(--very-light); }
+  .check-item.active { background: var(--light-blue); border-color: var(--med-blue); }
+  .check-item input[type=checkbox] { accent-color: var(--dark-blue); width: 14px; height: 14px; cursor: pointer; }
+  .check-item .ch-label { font-size: 12px; flex: 1; }
+
+  /* ── Comunas table ── */
+  .comunas-wrap { max-height: 340px; overflow-y: auto; }
+  .comunas-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .comunas-table th {
+    background: var(--light-blue);
+    color: var(--dark-blue);
+    font-weight: 700;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 1;
+    font-size: 11px;
+  }
+  .comunas-table td {
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .comunas-table tr:nth-child(even) td { background: var(--very-light); }
+  .comunas-table input[type=checkbox] { accent-color: var(--dark-blue); cursor: pointer; }
+  .comunas-table .num { text-align: right; }
+  .btn-sel-all {
+    font-size: 11px; padding: 3px 8px; margin: 0 4px 8px 0;
+    border: 1px solid var(--med-blue); border-radius: 3px;
+    background: white; color: var(--med-blue); cursor: pointer;
+  }
+  .btn-sel-all:hover { background: var(--light-blue); }
+
+  /* ── Intermediate table ── */
+  .inter-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .inter-table th {
+    background: var(--light-blue);
+    color: var(--dark-blue);
+    font-weight: 700;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    font-size: 11px;
+    text-align: center;
+  }
+  .inter-table td { padding: 5px 8px; border: 1px solid var(--border); }
+  .inter-table tr:nth-child(even) td { background: var(--gray-light); }
+  .inter-table .total-row td { background: var(--med-blue); color: white; font-weight: 700; }
+  .inter-table .num { text-align: right; }
+  .inter-table .dim  { color: var(--gray); font-style: italic; }
+
+  /* ── Results cards ── */
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .result-card {
+    border-radius: 5px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    background: var(--gray-light);
+  }
+  .result-card.highlight { background: var(--green-light); border-color: #a9d08e; }
+  .result-card.accent    { background: var(--light-blue);  border-color: var(--med-blue); }
+  .result-card .rc-label { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 4px; }
+  .result-card .rc-value { font-size: 20px; font-weight: 700; color: var(--dark-blue); }
+  .result-card.highlight .rc-value { color: var(--green-dark); }
+  .result-card .rc-note  { font-size: 10px; color: var(--gray); margin-top: 3px; }
+  .result-card.full { grid-column: span 2; }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    font-size: 10px;
+    color: var(--gray);
+    padding: 16px 32px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div>
+    <h1>Caso de Negocio &nbsp;·&nbsp; AFEX × Haulmer</h1>
+    <p>Análisis mensual de volumen transado, ingresos y márgenes · Región Metropolitana</p>
+  </div>
+</div>
+
+<div class="main">
+  <!-- ══ LEFT COLUMN ══ -->
+  <div class="col-left">
+
+    <!-- SECCIÓN 1: Parámetros -->
+    <div class="card">
+      <div class="card-header">Sección 1 — Parámetros del Modelo</div>
+      <div class="card-body">
+        <table class="param-table">
+          <tr>
+            <td class="lbl">Ticket (USD)</td>
+            <td class="inp"><input type="number" id="ticket" value="150" step="1" min="0"></td>
+            <td class="note">USD / transacción</td>
+          </tr>
+          <tr>
+            <td class="lbl">Tarifa Servicio</td>
+            <td class="inp"><input type="number" id="tarifa" value="3.0" step="0.1" min="0" max="100"></td>
+            <td class="note">% del TVD</td>
+          </tr>
+          <tr>
+            <td class="lbl">Comisión AFEX</td>
+            <td class="inp"><input type="number" id="comAfex" value="40" step="1" min="0" max="100"></td>
+            <td class="note">% del Ingreso Bruto</td>
+          </tr>
+          <tr>
+            <td class="lbl">Comisión HAULMER</td>
+            <td class="inp"><input type="number" id="comHaulmer" value="50" step="1" min="0" max="100"></td>
+            <td class="note">% del Ingreso Bruto</td>
+          </tr>
+          <tr>
+            <td class="lbl">Costo Haulmer</td>
+            <td class="inp"><input type="number" id="costoH" value="0.8" step="0.1" min="0"></td>
+            <td class="note">% del TVD</td>
+          </tr>
+          <tr>
+            <td class="lbl">Comisión Comercio (Ingreso Haulmer)</td>
+            <td class="inp"><input type="number" id="comCom" value="1.4" step="0.1" min="0"></td>
+            <td class="note">% del TVD</td>
+          </tr>
+          <tr>
+            <td class="lbl">Beneficio Comercio</td>
+            <td class="inp"><input type="number" id="benefCom" value="30" step="1" min="0"></td>
+            <td class="note">% del TVD al comercio</td>
+          </tr>
+          <tr>
+            <td class="lbl">Tipo de Cambio (USD/CLP)</td>
+            <td class="inp"><input type="number" id="fx" value="950" step="1" min="1"></td>
+            <td class="note">CLP por 1 USD</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: Rubros -->
+    <div class="card">
+      <div class="card-header">Sección 2 — Selección de Rubros</div>
+      <div class="check-grid" id="rubrosGrid"></div>
+    </div>
+
+    <!-- SECCIÓN 3: Escenario -->
+    <div class="card">
+      <div class="card-header">Sección 3 — Parámetros del Escenario</div>
+      <div class="card-body">
+        <table class="param-table">
+          <tr>
+            <td class="lbl">Market Share</td>
+            <td class="inp"><input type="number" id="marketShare" value="5" step="0.1" min="0" max="100"></td>
+            <td class="note">% del mercado potencial</td>
+          </tr>
+          <tr>
+            <td class="lbl">Transacciones / Tarjetahabiente / mes</td>
+            <td class="inp"><input type="number" id="transac" value="2" step="1" min="1"></td>
+            <td class="note">promedio mensual</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: Comunas -->
+    <div class="card">
+      <div class="card-header">Sección 4 — Selección de Comunas</div>
+      <div style="padding: 8px 14px 0">
+        <button class="btn-sel-all" onclick="toggleAll(true)">Seleccionar todas</button>
+        <button class="btn-sel-all" onclick="toggleAll(false)">Deseleccionar todas</button>
+      </div>
+      <div class="comunas-wrap">
+        <table class="comunas-table" id="comunasTable">
+          <thead>
+            <tr>
+              <th style="width:36px">Incl.</th>
+              <th style="text-align:left">Comuna</th>
+              <th>% Extj.</th>
+              <th>Total Hab.</th>
+            </tr>
+          </thead>
+          <tbody id="comunasTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end col-left -->
+
+  <!-- ══ RIGHT COLUMN ══ -->
+  <div class="col-right">
+
+    <!-- SECCIÓN 5: Intermedios -->
+    <div class="card">
+      <div class="card-header blue2">Sección 5 — Resultados Intermedios por Rubro</div>
+      <div class="card-body" style="padding:0">
+        <table class="inter-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Rubro</th>
+              <th>Tarjetahabientes Potenciales</th>
+              <th>Comercios Haulmer</th>
+            </tr>
+          </thead>
+          <tbody id="interTbody"></tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td><strong>TOTAL</strong></td>
+              <td class="num" id="totalTarj">—</td>
+              <td class="num" id="totalCom">—</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 6: Resultados Finales -->
+    <div class="card">
+      <div class="card-header green">Sección 6 — Resultados Finales</div>
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="rc-label">Tarjetahabientes Potenciales</div>
+          <div class="rc-value" id="r-tarj">—</div>
+          <div class="rc-note">personas</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-label">Total Comercios Evaluados</div>
+          <div class="rc-value" id="r-com">—</div>
+          <div class="rc-note">comercios Haulmer</div>
+        </div>
+        <div class="result-card accent full">
+          <div class="rc-label">TVD — Valor Total Transado (USD)</div>
+          <div class="rc-value" id="r-tvd">—</div>
+          <div class="rc-note">Tarj. Potenciales × Market Share × Ticket × Transacciones</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-label">Ingreso Bruto (USD)</div>
+          <div class="rc-value" id="r-ib">—</div>
+          <div class="rc-note">TVD × Tarifa Servicio</div>
+        </div>
+        <div class="result-card highlight">
+          <div class="rc-label">Margen Haulmer %</div>
+          <div class="rc-value" id="r-mgn-pct">—</div>
+          <div class="rc-note">ComHaulmer×Tarifa − CostoH + ComCom − BenefCom×Tarifa</div>
+        </div>
+        <div class="result-card highlight">
+          <div class="rc-label">Margen Haulmer $ (USD)</div>
+          <div class="rc-value" id="r-mgn-usd">—</div>
+          <div class="rc-note">Margen % × TVD</div>
+        </div>
+        <div class="result-card highlight full">
+          <div class="rc-label">Margen Haulmer $ (CLP)</div>
+          <div class="rc-value" id="r-mgn-clp">—</div>
+          <div class="rc-note">Margen USD × Tipo de Cambio</div>
+        </div>
+        <div class="result-card full">
+          <div class="rc-label">Margen por Comercio (USD / mes)</div>
+          <div class="rc-value" id="r-mgn-com">—</div>
+          <div class="rc-note">Beneficio Comercio × TVD / Total Comercios Evaluados</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end col-right -->
+</div><!-- end main -->
+
+<div class="footer">
+  Fuente: SEREMI MDS RM (mayo 2024) · INE–SERMIG 31/12/2022 · Comercios y Tarjetahabientes: Haulmer
+</div>
+
+<script>
+// ── Data ────────────────────────────────────────────────────────────────────
+const RUBROS = [
+  'Retail / Almacén','Gastronomía','Salud','Peluquería',
+  'Automotriz / Transporte','Retail Moda','Retail Tiendas Varias',
+  'Veterinaria','Otros'
+];
+
+const COMUNAS = [
+  {n:"Santiago",         pe:0.422, hab:527014, extj:222649, cl:[98246,55488,5060,4424,8591,15416,12217,1314,5435],  co:[268,162,78,83,55,116,123,15,719]},
+  {n:"Cerro Navia",      pe:0.089, hab:141507, extj:12549,  cl:[13787,4088,29,125,1413,278,1210,70,424],            co:[72,21,2,4,10,6,27,2,65]},
+  {n:"Conchalí",         pe:0.122, hab:138638, extj:16851,  cl:[12053,2996,32,97,555,15,1748,0,313],                co:[50,16,3,4,7,1,17,0,37]},
+  {n:"Estación Central", pe:0.271, hab:217664, extj:58948,  cl:[19477,6719,100,249,2635,2169,1023,27,540],          co:[66,20,5,10,14,26,23,2,91]},
+  {n:"Independencia",    pe:0.386, hab:150074, extj:57936,  cl:[18963,10538,315,701,185,953,1402,43,525],           co:[48,36,4,8,4,2,15,2,73]},
+  {n:"La Cisterna",      pe:0.136, hab:101313, extj:13771,  cl:[9785,5401,47,1194,1413,1802,1904,34,648],           co:[41,25,3,13,21,21,16,2,66]},
+  {n:"La Florida",       pe:0.072, hab:406229, extj:29200,  cl:[36418,13468,730,2533,1811,1720,4151,144,1250],      co:[161,55,34,29,28,15,55,2,215]},
+  {n:"Las Condes",       pe:0.123, hab:338541, extj:41688,  cl:[25405,47312,5195,6336,15367,2986,8764,778,2263],    co:[55,57,162,70,23,33,42,7,278]},
+  {n:"Lo Barnechea",     pe:0.105, hab:128439, extj:13473,  cl:[7402,4757,572,1697,3185,994,832,1,627],             co:[18,16,15,22,5,11,13,1,51]},
+  {n:"Lo Prado",         pe:0.112, hab:103732, extj:11664,  cl:[11590,1448,143,69,434,187,725,158,581],             co:[46,8,2,3,6,4,13,3,38]},
+  {n:"Macul",            pe:0.106, hab:137079, extj:14596,  cl:[14946,3228,20,23,149,561,945,373,215],              co:[31,16,6,2,11,9,17,4,55]},
+  {n:"Maipú",            pe:0.042, hab:585684, extj:24788,  cl:[52208,32406,1391,1745,1979,1624,6507,1689,1536],    co:[228,92,39,49,37,22,83,20,297]},
+  {n:"Ñuñoa",            pe:0.113, hab:259712, extj:29463,  cl:[30027,21782,1891,4575,7385,2155,2749,1193,799],     co:[66,57,39,49,15,34,50,11,184]},
+  {n:"Peñalolén",        pe:0.065, hab:270707, extj:17631,  cl:[25841,5657,215,2774,452,996,2557,135,495],          co:[87,34,8,17,9,3,54,4,99]},
+  {n:"Providencia",      pe:0.142, hab:161568, extj:22913,  cl:[33968,59460,7586,9656,10553,9092,7891,972,2055],    co:[58,105,219,129,24,59,102,9,424]},
+  {n:"Pudahuel",         pe:0.052, hab:258535, extj:13429,  cl:[35342,19256,32,1075,8512,877,3094,584,457],         co:[103,48,6,8,30,13,50,9,118]},
+  {n:"Quilicura",        pe:0.107, hab:266818, extj:28453,  cl:[25354,8739,410,838,1136,114,2129,59,952],           co:[104,43,7,16,11,5,43,1,112]},
+  {n:"Quinta Normal",    pe:0.213, hab:140055, extj:29866,  cl:[22199,5399,443,186,693,337,1699,0,182],             co:[70,29,3,7,19,4,24,0,66]},
+  {n:"Recoleta",         pe:0.195, hab:195185, extj:38089,  cl:[39567,12941,310,294,2279,2442,3751,1,3346],         co:[154,48,4,5,14,39,55,1,149]},
+  {n:"San Joaquín",      pe:0.125, hab:103704, extj:12970,  cl:[12689,6160,304,409,391,791,940,69,650],             co:[39,22,2,5,10,7,22,1,62]},
+  {n:"San Miguel",       pe:0.204, hab:139729, extj:28534,  cl:[28158,5470,474,1066,1018,269,1533,439,400],         co:[66,32,19,15,11,4,36,7,98]},
+  {n:"Vitacura",         pe:0.118, hab:97651,  extj:11536,  cl:[9008,13829,1060,1795,8305,2048,1016,128,2523],      co:[12,25,28,21,9,19,10,2,84]},
+  {n:"Puente Alto",      pe:0.032, hab:660361, extj:21243,  cl:[50927,19945,1171,2039,12334,3994,8988,1789,1577],   co:[300,71,24,36,39,34,146,14,356]},
+  {n:"Colina",           pe:0.093, hab:189757, extj:17645,  cl:[7933,6062,388,2250,335,1002,2495,17,510],           co:[44,26,11,20,13,12,17,1,105]},
+  {n:"San Bernardo",     pe:0.052, hab:342411, extj:17943,  cl:[35023,10902,625,997,1164,7442,2776,1268,815],       co:[173,43,14,14,21,14,58,7,141]},
+  {n:"Melipilla",        pe:0.084, hab:145583, extj:12296,  cl:[21113,10698,1569,502,6973,1561,2863,473,736],       co:[84,44,8,6,18,17,32,3,137]},
+];
+
+// ── Build UI ─────────────────────────────────────────────────────────────────
+function buildRubros() {
+  const g = document.getElementById('rubrosGrid');
+  RUBROS.forEach((r, i) => {
+    const div = document.createElement('div');
+    div.className = 'check-item active';
+    div.id = `rub-item-${i}`;
+    div.innerHTML = `<input type="checkbox" id="rub${i}" checked onchange="updateRubroStyle(${i});calc()">
+                     <label class="ch-label" for="rub${i}">${r}</label>`;
+    g.appendChild(div);
+  });
+}
+
+function updateRubroStyle(i) {
+  const el = document.getElementById(`rub-item-${i}`);
+  const cb = document.getElementById(`rub${i}`);
+  el.classList.toggle('active', cb.checked);
+}
+
+function buildComunas() {
+  const tb = document.getElementById('comunasTbody');
+  COMUNAS.forEach((c, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:center"><input type="checkbox" id="com${i}" checked onchange="calc()"></td>
+      <td>${c.n}</td>
+      <td class="num">${(c.pe*100).toFixed(1)}%</td>
+      <td class="num">${c.hab.toLocaleString('es-CL')}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function buildIntermedios() {
+  const tb = document.getElementById('interTbody');
+  RUBROS.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.id = `inter-row-${i}`;
+    tr.innerHTML = `
+      <td id="ir-name-${i}" class="dim">${r}</td>
+      <td class="num" id="ir-tarj-${i}">—</td>
+      <td class="num" id="ir-com-${i}">—</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function toggleAll(sel) {
+  COMUNAS.forEach((_, i) => { document.getElementById(`com${i}`).checked = sel; });
+  calc();
+}
+
+// ── Formatting ───────────────────────────────────────────────────────────────
+const fmtN = n => Math.round(n).toLocaleString('es-CL');
+const fmtUSD = n => `USD ${Math.round(n).toLocaleString('es-CL')}`;
+const fmtCLP = n => `CLP ${Math.round(n).toLocaleString('es-CL')}`;
+const fmtPct = n => `${(n*100).toFixed(2)}%`;
+
+// ── Main calculation ─────────────────────────────────────────────────────────
+function calc() {
+  const ticket     = +document.getElementById('ticket').value      || 0;
+  const tarifa     = (+document.getElementById('tarifa').value     || 0) / 100;
+  const comHaulmer = (+document.getElementById('comHaulmer').value || 0) / 100;
+  const costoH     = (+document.getElementById('costoH').value     || 0) / 100;
+  const comCom     = (+document.getElementById('comCom').value     || 0) / 100;
+  const benefCom   = (+document.getElementById('benefCom').value   || 0) / 100;
+  const fx         = +document.getElementById('fx').value          || 0;
+  const mktShare   = (+document.getElementById('marketShare').value|| 0) / 100;
+  const transac    = +document.getElementById('transac').value      || 0;
+
+  let totalTarj = 0, totalCom = 0;
+
+  RUBROS.forEach((_, ri) => {
+    const rubroSel = document.getElementById(`rub${ri}`).checked;
+    let tarj = 0, com = 0;
+    if (rubroSel) {
+      COMUNAS.forEach((c, ci) => {
+        if (document.getElementById(`com${ci}`).checked) {
+          tarj += c.cl[ri] * c.pe;
+          com  += c.co[ri];
+        }
+      });
+    }
+    const tr = document.getElementById(`inter-row-${ri}`);
+    const nm = document.getElementById(`ir-name-${ri}`);
+    if (tr) tr.style.opacity = rubroSel ? '1' : '0.4';
+    if (nm) nm.className = rubroSel ? '' : 'dim';
+    document.getElementById(`ir-tarj-${ri}`).textContent = rubroSel ? fmtN(tarj) : '—';
+    document.getElementById(`ir-com-${ri}`).textContent  = rubroSel ? fmtN(com)  : '—';
+    totalTarj += tarj;
+    totalCom  += com;
+  });
+
+  document.getElementById('totalTarj').textContent = fmtN(totalTarj);
+  document.getElementById('totalCom').textContent  = fmtN(totalCom);
+
+  const tvd       = totalTarj * mktShare * ticket * transac;
+  const ingrBruto = tvd * tarifa;
+  const mgnPct    = (comHaulmer * tarifa) - costoH + comCom - (benefCom * tarifa);
+  const mgnUSD    = mgnPct * tvd;
+  const mgnCLP    = mgnUSD * fx;
+  const mgnCom    = totalCom > 0 ? benefCom * tvd / totalCom : 0;
+
+  document.getElementById('r-tarj').textContent    = fmtN(totalTarj);
+  document.getElementById('r-com').textContent     = fmtN(totalCom);
+  document.getElementById('r-tvd').textContent     = fmtUSD(tvd);
+  document.getElementById('r-ib').textContent      = fmtUSD(ingrBruto);
+  document.getElementById('r-mgn-pct').textContent = fmtPct(mgnPct);
+  document.getElementById('r-mgn-usd').textContent = fmtUSD(mgnUSD);
+  document.getElementById('r-mgn-clp').textContent = fmtCLP(mgnCLP);
+  document.getElementById('r-mgn-com').textContent = `USD ${mgnCom.toLocaleString('es-CL', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+}
+
+// ── Init ────────────────────────────────────────────────────────────────────
+buildRubros();
+buildComunas();
+buildIntermedios();
+document.querySelectorAll('input').forEach(el => el.addEventListener('input', calc));
+calc();
+</script>
+</body>
+</html>
