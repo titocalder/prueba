@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    :root {
+      --bg: #eaf4ff;
+      --card: #ffffff;
+      --muted: #5f6c89;
+      --text: #111b35;
+      --accent: #2457ff;
+      --ok: #21c17a;
+      --warn: #ffcd57;
+      --border: #d9e2ff;
+      --tuu-blue: #2457ff;
+      --tuu-yellow: #ffd447;
+      --tuu-lilac: #eef0ff;
+      --tuu-mint: #e8fff4;
+      --tuu-peach: #fff4e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Poppins", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 10px 24px rgba(36, 87, 255, 0.08);
+    }
+    .header-card {
+      border-left: 6px solid var(--tuu-blue);
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid #dbe4ff;
+      background: #fff;
+    }
+    .brand-chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #3a4d83;
+      background: #eef3ff;
+      border: 1px solid #dbe5ff;
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+    h1 { margin: 0 0 8px; font-size: 24px; }
+    h2 { margin: 0 0 12px; font-size: 16px; color: #1d2b55; }
+    .sub { color: var(--muted); margin: 0; font-size: 13px; }
+    .grid-2 { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+    label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; }
+    input {
+      width: 100%;
+      background: #fff;
+      color: var(--text);
+      border: 1px solid #cdd9ff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(36, 87, 255, 0.12);
+    }
+    .step1-card { background: linear-gradient(180deg, #eef3ff 0%, #ffffff 90%); }
+    .step2-card { background: linear-gradient(180deg, #ebfff6 0%, #ffffff 90%); }
+    .step3-card { background: linear-gradient(180deg, #fff8e8 0%, #ffffff 90%); }
+    .outputs-card { background: linear-gradient(180deg, #f4f1ff 0%, #ffffff 90%); }
+    .margin-card { background: linear-gradient(180deg, #ffeef1 0%, #ffffff 90%); }
+    .kpis {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .kpi {
+      background: #fff;
+      border: 1px solid #d5e0ff;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .kpi .t { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+    .kpi .v { font-weight: 700; font-size: 16px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      border-bottom: 1px solid #22315a;
+      padding: 10px 8px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: #4b5d91; font-weight: 600; }
+    tr.best-row td {
+      font-weight: 800;
+      background: #fff7d9;
+    }
+    tr.best-row td:first-child {
+      color: #7b5a00;
+    }
+    .best {
+      color: #0c7a48;
+      font-weight: 800;
+      background: #e9fff4;
+      border: 1px solid #b8f1d6;
+      border-radius: 999px;
+      padding: 4px 10px;
+      display: inline-block;
+    }
+    .mini-table td {
+      padding: 8px 6px;
+      border-bottom: 1px solid #22315a;
+      font-size: 13px;
+    }
+    .mini-table td:first-child { color: var(--muted); }
+    .mini-table td:last-child { text-align: right; font-weight: 700; }
+    .warn {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #b42318;
+      font-weight: 600;
+    }
+    .footer {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .fields { grid-template-columns: 1fr; }
+      .kpis { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card header-card">
+      <div class="brand-row">
+        <img class="brand-logo" src="https://www.tuu.cl/favicon.ico" alt="TUU" />
+        <span class="brand-chip">Estilo visual inspirado en TUU</span>
+      </div>
+      <h1>Calculadora</h1>
+      <p class="sub">Inputs base + evaluación de modelos comisionales A/B/C/D.</p>
+    </div>
+
+    <div class="grid-2">
+      <section class="card step1-card">
+        <h2>PASO 1: Inputs</h2>
+        <div class="fields">
+          <div>
+            <label for="ticketPromedio">Ticket Promedio (CLP)</label>
+            <input id="ticketPromedio" type="number" value="47200" />
+          </div>
+          <div>
+            <label for="sii">SII</label>
+            <input id="sii" type="number" value="107300" />
+          </div>
+          <div>
+            <label for="mcc">MCC*</label>
+            <input id="mcc" type="number" value="5441" />
+            <div id="mccWarn" class="warn" style="display:none"></div>
+          </div>
+          <div>
+            <label for="txDebito">Transacciones Debito (monto mensual CLP)</label>
+            <input id="txDebito" type="number" value="5334000000" />
+          </div>
+          <div>
+            <label for="txCredito">Transacciones Credito (monto mensual CLP)</label>
+            <input id="txCredito" type="number" value="666000000" />
+          </div>
+          <div>
+            <label for="totalTx">Total transacciones (auto: débito + crédito)</label>
+            <input id="totalTx" type="number" value="6000000000" readonly />
+          </div>
+        </div>
+      </section>
+
+      <section class="card step2-card">
+        <h2>PASO 2: Derivados automáticos</h2>
+        <div class="kpis">
+          <div class="kpi"><div class="t">%Monto Débito</div><div class="v" id="pDebito">-</div></div>
+          <div class="kpi"><div class="t">%Monto Crédito</div><div class="v" id="pCredito">-</div></div>
+          <div class="kpi"><div class="t">Cantidad total de tx</div><div class="v" id="qTotal">-</div></div>
+          <div class="kpi"><div class="t">Cantidad tx débito</div><div class="v" id="qDebito">-</div></div>
+          <div class="kpi"><div class="t">Cantidad tx crédito</div><div class="v" id="qCredito">-</div></div>
+          <div class="kpi"><div class="t">Costo base referencia</div><div class="v" id="costoBase">-</div></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card step3-card">
+      <h2>PASO 3: Modelos comisionales</h2>
+      <table id="tablaModelos">
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th>% Débito</th>
+            <th>Fijo Débito</th>
+            <th>% Crédito</th>
+            <th>Fijo Crédito</th>
+            <th>Ingreso Mensual</th>
+            <th>Margen Mensual</th>
+            <th>Margen %</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p style="margin-top:10px"><strong>Mejor modelo:</strong> <span class="best" id="mejorModelo">-</span></p>
+      <p class="sub" id="mccInfo" style="margin-top:6px">MCC aplicado: -</p>
+    </section>
+
+    <div class="grid-2">
+      <section class="card outputs-card">
+        <h2>Output</h2>
+        <table class="mini-table">
+          <tbody>
+            <tr><td>Costo Debito</td><td id="costoDebitoOut">-</td></tr>
+            <tr><td>Costo Credito</td><td id="costoCreditoOut">-</td></tr>
+            <tr><td>Costo Total</td><td id="costoTotalOut">-</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card margin-card">
+        <h2>Margen transaccional</h2>
+        <table class="mini-table">
+          <tbody>
+            <tr><td>Ingresos Comisión</td><td id="ingresosComisionOut">-</td></tr>
+            <tr><td>Costos Comisión</td><td id="costosComisionOut">-</td></tr>
+            <tr><td>Margen</td><td id="margenOut">-</td></tr>
+            <tr><td>Margen (%)</td><td id="margenPctOut">-</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <section class="card footer">
+      <strong>Notas:</strong>
+      <br />- Puedes editar cualquiera de los 6 inputs.
+      <br />- Si el total ingresado no coincide con débito + crédito, el modelo usa el total ingresado para métricas globales.
+      <br />- Esta versión es demo para caso de negocio. Se puede ajustar a la lógica exacta de tu Excel.
+    </section>
+  </div>
+
+  <script>
+    // Tramos y tasas tomadas desde hoja "Comisiones" del Excel.
+    const tramosComisiones = [
+      { hasta: 20000000,   bDeb: 0.0119, bCre: 0.0154, cDeb: 0.0139, cCre: 0.0139 },
+      { hasta: 75000000,   bDeb: 0.0109, bCre: 0.0149, cDeb: 0.0129, cCre: 0.0129 },
+      { hasta: 300000000,  bDeb: 0.0099, bCre: 0.0139, cDeb: 0.0119, cCre: 0.0119 },
+      { hasta: 750000000,  bDeb: 0.0097, bCre: 0.0137, cDeb: 0.0117, cCre: 0.0117 },
+      { hasta: 2000000000, bDeb: 0.0095, bCre: 0.0135, cDeb: 0.0115, cCre: 0.0115 },
+      { hasta: 7500000000, bDeb: 0.0093, bCre: 0.0132, cDeb: 0.0113, cCre: 0.0113 }
+    ];
+
+    const fmtMoney = n => new Intl.NumberFormat("es-CL", { maximumFractionDigits: 0 }).format(n || 0);
+    const fmtMoney2 = n => new Intl.NumberFormat("es-CL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
+    const fmtPct = (n, d = 2) => `${((n || 0) * 100).toFixed(d)}%`;
+    const byId = id => document.getElementById(id);
+    const BASE_COST_DEB = 0.00498882;
+    const BASE_COST_CRED = 0.01140001;
+    const MCC_TI_MAP = {"9399":{"cred":0.0114076,"deb":0.00496902},"7995":{"cred":0.01140087,"deb":0.00497421},"7699":{"cred":0.01139937,"deb":0.00499663},"4789":{"cred":0.0114001,"deb":0.00498723},"5946":{"cred":0.01140087,"deb":0.00497421},"7549":{"cred":0.01139904,"deb":0.00499509},"7333":{"cred":0.01139995,"deb":0.00499072},"2741":{"cred":0.01118881,"deb":0.00499581},"8050":{"cred":0.01140018,"deb":0.00499577},"5945":{"cred":0.01139998,"deb":0.00499605},"5950":{"cred":0.01140002,"deb":0.00499423},"7997":{"cred":0.01140049,"deb":0.0049983},"5998":{"cred":0.01140044,"deb":0.00499417},"4722":{"cred":0.01139896,"deb":0.00499968},"5571":{"cred":0.01140011,"deb":0.00499378},"4131":{"cred":0.010424,"deb":0.00499986},"5681":{"cred":0.01139889,"deb":0.00499649},"5697":{"cred":0.0114002,"deb":0.00499474},"5976":{"cred":0.01140058,"deb":0.00499681},"5992":{"cred":0.01139998,"deb":0.00499875},"5533":{"cred":0.01139997,"deb":0.00499852},"5200":{"cred":0.01140083,"deb":0.00499946},"5941":{"cred":0.01140003,"deb":0.00499775},"4121":{"cred":0.0114003,"deb":0.00499617},"7394":{"cred":0.01140008,"deb":0.00499837},"8099":{"cred":0.01140001,"deb":0.00499936},"5940":{"cred":0.01140017,"deb":0.00499831},"8071":{"cred":0.01139994,"deb":0.00499959},"5948":{"cred":0.01140008,"deb":0.00499876},"5932":{"cred":0.01140026,"deb":0.00499972},"5261":{"cred":0.01140006,"deb":0.00499888},"7349":{"cred":0.0113998,"deb":0.00499907},"5712":{"cred":0.01139997,"deb":0.00499866},"4411":{"cred":0.01140001,"deb":0.00500752},"5047":{"cred":0.01139951,"deb":0.005},"7911":{"cred":0.01140006,"deb":0.00499902},"4215":{"cred":0.0114002,"deb":0.00499944},"8299":{"cred":0.00600814,"deb":0.00449996},"5733":{"cred":0.01140025,"deb":0.00499781},"8641":{"cred":0.01139994,"deb":0.00499985},"8021":{"cred":0.01140005,"deb":0.0049998},"7033":{"cred":0.0114076,"deb":0.00496902},"5511":{"cred":0.01137536,"deb":0.00499992},"7342":{"cred":0.01140087,"deb":0.00497421},"8249":{"cred":0.00995315,"deb":0.00499996},"1731":{"cred":0.01139998,"deb":0.00499832},"7261":{"cred":0.01139977,"deb":0.00499994},"8351":{"cred":0.0095576,"deb":0.00471902},"5441":{"cred":0.01140001,"deb":0.00498882},"5085":{"cred":0.01094854,"deb":0.00499599},"5970":{"cred":0.01139986,"deb":0.00499369},"8911":{"cred":0.0114076,"deb":0.00496902},"5994":{"cred":0.01140087,"deb":0.00497421},"5211":{"cred":0.01140006,"deb":0.00499971},"7523":{"cred":0.0114008,"deb":0.004979},"7832":{"cred":0.01139908,"deb":0.00498874},"1799":{"cred":0.01140019,"deb":0.00499354},"5811":{"cred":0.01139985,"deb":0.00498503},"4816":{"cred":0.01140439,"deb":0.00494458},"5942":{"cred":0.01139989,"deb":0.00498561},"5309":{"cred":0.0113998,"deb":0.00499513},"7538":{"cred":0.01139998,"deb":0.0049986},"5462":{"cred":0.01140022,"deb":0.00498469},"8111":{"cred":0.01140047,"deb":0.00499858},"5411":{"cred":0.0114002,"deb":0.00498821},"5045":{"cred":0.01140003,"deb":0.00499794},"7996":{"cred":0.01140118,"deb":0.00498651},"5311":{"cred":0.0114002,"deb":0.00499351},"5499":{"cred":0.01140032,"deb":0.00499145},"7210":{"cred":0.0114009,"deb":0.00499692},"5713":{"cred":0.01140008,"deb":0.00499792},"6513":{"cred":0.01140048,"deb":0.00499756},"7941":{"cred":0.0114001,"deb":0.00499514},"5921":{"cred":0.01140126,"deb":0.00498664},"1711":{"cred":0.0114076,"deb":0.00496902},"5931":{"cred":0.0114076,"deb":0.00496902},"5949":{"cred":0.0114076,"deb":0.00496902},"7361":{"cred":0.0114076,"deb":0.00496902},"7932":{"cred":0.0114076,"deb":0.00496902},"5962":{"cred":0.0114076,"deb":0.00496902},"5542":{"cred":0.0100826,"deb":0.00484402},"5231":{"cred":0.0114076,"deb":0.00496902},"5044":{"cred":0.0114076,"deb":0.00496902},"4112":{"cred":0.0104326,"deb":0.00496902},"5399":{"cred":0.01139995,"deb":0.0049959},"4899":{"cred":0.0063826,"deb":0.00314402},"7622":{"cred":0.01139969,"deb":0.00499987},"5714":{"cred":0.01139991,"deb":0.00499325},"7338":{"cred":0.01139645,"deb":0.00497832},"7999":{"cred":0.01140029,"deb":0.00499358},"5814":{"cred":0.01140014,"deb":0.00499509},"7299":{"cred":0.01140019,"deb":0.00499434},"7011":{"cred":0.01139992,"deb":0.00499892},"8931":{"cred":0.01140665,"deb":0.00499138},"5532":{"cred":0.01140005,"deb":0.00499917},"5732":{"cred":0.01140005,"deb":0.00499625},"5995":{"cred":0.01139999,"deb":0.00499511},"8398":{"cred":0.00602682,"deb":0.00449382},"7230":{"cred":0.01140013,"deb":0.00499861},"5422":{"cred":0.01140002,"deb":0.00499793},"5912":{"cred":0.01139964,"deb":0.00499376},"5719":{"cred":0.0114004,"deb":0.00499683},"7393":{"cred":0.01139984,"deb":0.00499364},"5651":{"cred":0.01140002,"deb":0.00499747},"5661":{"cred":0.01140019,"deb":0.00499936},"8999":{"cred":0.01139999,"deb":0.00499806},"5977":{"cred":0.01140008,"deb":0.0049968},"4214":{"cred":0.01140029,"deb":0.00499564},"7012":{"cred":0.01139997,"deb":0.00499691},"5813":{"cred":0.01139992,"deb":0.00499872},"1520":{"cred":0.01140007,"deb":0.00499835},"5735":{"cred":0.01140009,"deb":0.00499975},"5944":{"cred":0.01140002,"deb":0.0049967},"742":{"cred":0.01139999,"deb":0.00499928},"4900":{"cred":0.00135022,"deb":0.00134995},"8043":{"cred":0.01140017,"deb":0.00499974},"4814":{"cred":0.00134982,"deb":0.00134997},"8062":{"cred":0.01140001,"deb":0.00499972},"4119":{"cred":0.01139989,"deb":0.0049999}};
+    const BASE_TI = MCC_TI_MAP["5441"];
+    const SII_TO_MCC_MAP = {
+      "107300": "5441",
+      "463014": "5441",
+      "463019": "5499",
+      "463020": "5921",
+      "471100": "5411",
+      "472109": "5499",
+      "472200": "5921",
+      "478100": "5499",
+      "563001": "5813"
+    };
+
+    function getMastercardFixedCmClp(ticketClp) {
+      const ticketUsd = ticketClp / 990;
+      if (ticketUsd > 25) return 35.4618;
+      if (ticketUsd > 10) return 23.1858;
+      if (ticketUsd > 5) return 14.4936;
+      if (ticketUsd > 1) return 5.0292;
+      return 3.2373;
+    }
+
+    function getKushkiParts(paymentType, brand) {
+      const isCredit = paymentType === "credit";
+      if (brand === "mc") {
+        return isCredit ? { cm: 0.0024, ti: 0.0114 } : { cm: 0.0018, ti: 0.0050 };
+      }
+      return isCredit ? { cm: 0.0015, ti: 0.0114 } : { cm: 0.0016, ti: 0.0050 };
+    }
+
+    function getCmForBrand(paymentType, brand, ticketClp) {
+      const isCredit = paymentType === "credit";
+      if (brand === "visa") {
+        const fixedClp = 7.821;
+        const variable = isCredit ? 0.0009 : 0.0009;
+        return fixedClp + (variable * ticketClp);
+      }
+      const fixedClp = getMastercardFixedCmClp(ticketClp);
+      const variable = isCredit ? 0.0010 : 0.00036;
+      return fixedClp + (variable * ticketClp);
+    }
+
+    function resolveCostPercentages(mccValue, ticketClp) {
+      if (!ticketClp) {
+        return { debPct: BASE_COST_DEB, credPct: BASE_COST_CRED, source: "ticket invalido" };
+      }
+      const key = String(parseInt(mccValue, 10) || "");
+      const ti = MCC_TI_MAP[key];
+      const source = ti ? `exacto (${key})` : "fallback base";
+      if (!ti || !BASE_TI) {
+        return { debPct: BASE_COST_DEB, credPct: BASE_COST_CRED, source: "fallback base" };
+      }
+
+      const marginKlap = 8.0;
+      const marginKushki = 8.0;
+      const marginTbkCredit = 53.387971;
+      const marginTbkDebit = 49.741776;
+
+      const q3 = Math.min(
+        getCmForBrand("credit", "visa", ticketClp) + (ti.cred * ticketClp) + marginKlap,
+        (getKushkiParts("credit", "visa").cm * ticketClp) + (getKushkiParts("credit", "visa").ti * ticketClp) + marginKushki,
+        getCmForBrand("credit", "visa", ticketClp) + (ti.cred * ticketClp) + marginTbkCredit
+      );
+      const q4 = Math.min(
+        getCmForBrand("credit", "mc", ticketClp) + (ti.cred * ticketClp) + marginKlap,
+        (getKushkiParts("credit", "mc").cm * ticketClp) + (getKushkiParts("credit", "mc").ti * ticketClp) + marginKushki,
+        getCmForBrand("credit", "mc", ticketClp) + (ti.cred * ticketClp) + marginTbkCredit
+      );
+      const q5 = Math.min(
+        getCmForBrand("debit", "visa", ticketClp) + (ti.deb * ticketClp) + marginKlap,
+        (getKushkiParts("debit", "visa").cm * ticketClp) + (getKushkiParts("debit", "visa").ti * ticketClp) + marginKushki,
+        getCmForBrand("debit", "visa", ticketClp) + (ti.deb * ticketClp) + marginTbkDebit
+      );
+      const q6 = Math.min(
+        getCmForBrand("debit", "mc", ticketClp) + (ti.deb * ticketClp) + marginKlap,
+        (getKushkiParts("debit", "mc").cm * ticketClp) + (getKushkiParts("debit", "mc").ti * ticketClp) + marginKushki,
+        getCmForBrand("debit", "mc", ticketClp) + (ti.deb * ticketClp) + marginTbkDebit
+      );
+
+      const credPct = ((q3 + q4) / 2) / ticketClp;
+      const debPct = ((q5 + q6) / 2) / ticketClp;
+      return { debPct, credPct, source };
+    }
+
+    function recalc() {
+      const ticket = Number(byId("ticketPromedio").value) || 0;
+      const mccRaw = String(byId("mcc").value || "").trim();
+      const mcc = Number(mccRaw) || 0;
+      const montoDeb = Number(byId("txDebito").value) || 0;
+      const montoCre = Number(byId("txCredito").value) || 0;
+      const sii = Number(byId("sii").value) || 0;
+      const totalMonto = montoDeb + montoCre;
+      byId("totalTx").value = Math.round(totalMonto);
+
+      const pDeb = totalMonto > 0 ? montoDeb / totalMonto : 0;
+      const pCre = totalMonto > 0 ? montoCre / totalMonto : 0;
+
+      const qTotal = ticket > 0 ? totalMonto / ticket : 0;
+      const qDeb = qTotal * pDeb;
+      const qCre = qTotal * pCre;
+
+      byId("pDebito").textContent = fmtPct(pDeb);
+      byId("pCredito").textContent = fmtPct(pCre);
+      byId("qTotal").textContent = fmtMoney(qTotal);
+      byId("qDebito").textContent = fmtMoney(qDeb);
+      byId("qCredito").textContent = fmtMoney(qCre);
+
+      // Costos base ajustados por MCC exacto desde tabla TI v2.
+      // Si MCC viene vacio, se intenta inferir por SII. Si MCC viene lleno y no existe, se usa fallback base y se avisa.
+      const inferredMcc = Number(SII_TO_MCC_MAP[String(sii)] || 0);
+      const effectiveMcc = mccRaw !== "" ? mcc : inferredMcc;
+      const mccKey = String(parseInt(effectiveMcc, 10) || "");
+      const hasExactMcc = !!MCC_TI_MAP[mccKey];
+      const { debPct: costoDebPct, credPct: costoCredPct, source: mccSource } = resolveCostPercentages(effectiveMcc, ticket);
+      const warnEl = byId("mccWarn");
+      if (mccRaw !== "" && !hasExactMcc) {
+        warnEl.style.display = "block";
+        warnEl.textContent = "MCC no encontrado en Tasa Intercambio v2. Se aplica fallback base.";
+      } else {
+        warnEl.style.display = "none";
+        warnEl.textContent = "";
+      }
+      // Fórmulas equivalentes a Excel:
+      // costo_debito_pct = PROMEDIO(Q5:Q6)/C3
+      // costo_credito_pct = PROMEDIO(Q3:Q4)/C3
+      // costo_total = PROMEDIO(Q5:Q6)*C9*C10 + PROMEDIO(Q3:Q4)*C9*C11
+      const avgQDeb = ticket * costoDebPct;
+      const avgQCred = ticket * costoCredPct;
+      const costoDeb = avgQDeb * qTotal * pDeb;
+      const costoCred = avgQCred * qTotal * pCre;
+      const costoBase = costoDeb + costoCred;
+      byId("costoBase").textContent = `$${fmtMoney(costoBase)}`;
+      byId("costoDebitoOut").textContent = `${fmtPct(costoDebPct, 6)} ($${fmtMoney(costoDeb)})`;
+      byId("costoCreditoOut").textContent = `${fmtPct(costoCredPct, 6)} ($${fmtMoney(costoCred)})`;
+      byId("costoTotalOut").textContent = `$${fmtMoney(costoBase)}`;
+
+      const tramo = tramosComisiones.find(t => totalMonto <= t.hasta) || tramosComisiones[tramosComisiones.length - 1];
+      const modelos = [
+        { nombre: "Modelo A", pDeb: 0.0062,      fDeb: 65, pCre: 0.0149,      fCre: 65 },
+        { nombre: "Modelo B", pDeb: tramo.bDeb,  fDeb: 0,  pCre: tramo.bCre,  fCre: 0  },
+        { nombre: "Modelo C", pDeb: tramo.cDeb,  fDeb: 0,  pCre: tramo.cCre,  fCre: 0  },
+        { nombre: "Modelo D", pDeb: 0.0079,      fDeb: 65, pCre: 0.0079,      fCre: 65 }
+      ];
+
+      const tbody = document.querySelector("#tablaModelos tbody");
+      tbody.innerHTML = "";
+
+      let best = null;
+      const rowsMeta = [];
+      for (const m of modelos) {
+        const ingresoDeb = (m.pDeb * montoDeb) + (m.fDeb * qDeb);
+        const ingresoCre = (m.pCre * montoCre) + (m.fCre * qCre);
+        const ingreso = ingresoDeb + ingresoCre;
+        const margen = ingreso - costoBase;
+        const margenPct = totalMonto > 0 ? margen / totalMonto : 0;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${m.nombre}</td>
+          <td>${fmtPct(m.pDeb)}</td>
+          <td>$${fmtMoney(m.fDeb)}</td>
+          <td>${fmtPct(m.pCre)}</td>
+          <td>$${fmtMoney(m.fCre)}</td>
+          <td>$${fmtMoney2(ingreso)}</td>
+          <td>$${fmtMoney2(margen)}</td>
+          <td>${fmtPct(margenPct)}</td>
+        `;
+        tbody.appendChild(tr);
+        rowsMeta.push({ tr, modelo: m.nombre, margen });
+
+        if (!best || margen > best.margen) best = { nombre: m.nombre, margen, ingreso };
+      }
+      for (const row of rowsMeta) {
+        if (best && row.modelo === best.nombre) {
+          row.tr.classList.add("best-row");
+          const firstCell = row.tr.querySelector("td");
+          if (firstCell) firstCell.textContent = `⭐ ${row.modelo}`;
+        }
+      }
+      byId("mejorModelo").textContent = best ? `⭐ ${best.nombre} (margen: $${fmtMoney(best.margen)})` : "-";
+
+      const ingresoComision = best ? best.ingreso : 0;
+      const margenOut = ingresoComision - costoBase;
+      const margenPctOut = totalMonto > 0 ? (margenOut / totalMonto) : 0;
+      byId("ingresosComisionOut").textContent = `$${fmtMoney(ingresoComision)}`;
+      byId("costosComisionOut").textContent = `$${fmtMoney(costoBase)}`;
+      byId("margenOut").textContent = `$${fmtMoney(margenOut)}`;
+      byId("margenPctOut").textContent = fmtPct(margenPctOut);
+      const mccMsg = `MCC aplicado: ${effectiveMcc || "-"} (${mccSource})`;
+      byId("mejorModelo").title = mccMsg;
+      byId("mccInfo").textContent = mccMsg;
+    }
+
+    ["ticketPromedio", "sii", "mcc", "txDebito", "txCredito"]
+      .forEach(id => byId(id).addEventListener("input", recalc));
+
+    recalc();
+  </script>
+</body>
+</html>
